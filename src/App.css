@@ -1,31 +1,6 @@
-.App {
-  text-align: center;
-}
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
+* {
+  box-sizing: border-box;
 }
 
 .lt-table {
@@ -38,5 +13,134 @@
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+.lt-table-col-th {
+  position:relative;
+  cursor: pointer;
+}
+.filter-menu {
+  display:none;
+}
+.filter-menu.active {
+  display: block;
+  clear:both;
+  position: absolute;
+  top: 100%;
+  left:0; 
+  background: white;
+  height: 15rem;
+  width: 100%;
+  padding: 0.4rem;
+  box-sizing: border-box;
+}
+
+
+.lt-table-col-th {
+  padding: 1rem;
+  border: 1px solid #ddd;
+  white-space: nowrap;
+}
+
+
+.lt-table-container {
+  width: 1000px;
+}
+.lt-table {
+  border-collapse: collapse;
+  width: 100%;
+  text-align: left;
+}
+
+.lt-table-controls {
+  float:left;
+  display:block;
+  clear:both;
+  padding-bottom: 1rem;
+  padding-top: 1rem;
+  padding-lefT: 2rem;
+  width: 100%;
+}
+
+.lt-table-controls .search-input-field {
+  float:left;
+  margin-top:1rem;
+}
+.lt-table-controls .search-input-field .lt-table-search-input {
+  margin-right: 1rem;
+}
+
+.lt-table-controls .lt-table-spinner-container {
+  float:right;
+}
+
+.lt-table td, .lt-table th {
+  border: 1px solid #ddd;
+  padding: 1rem;
+}
+
+.col-filter-button {
+  /* float:left; */
+  margin-left: 1rem;
+}
+
+.col-filter-button-text {
+  display: none;
+}
+
+.lt-paginator-buttons-list {
+  list-style-type: none;
+  float:left;
+  
+}
+
+.lt-paginator-buttons-list li {
+  display: inline-block;
+  margin-right: 0.2rem;
+}
+
+.lt-table-paginator-container {
+  width: 100%;
+  display: block;
+  float:left;
+  clear:both;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  padding-left: 2rem;
+}
+
+.lt-table-paginator-container button.active {
+  color:red;
+}
+
+
+.lt-table-paginator-container .paginator-button {
+  float:left;
+}
+
+.lt-table-paginator-container .prev-button {
+  margin-right: 1rem;
+}
+
+.lt-table-paginator-container .next-button {
+  margin-left: 1rem;
+}
+
+
+
+.lt-spinner-loading-text {
+  animation: 1.4s ease-in-out infinite both spinner-fade;
+}
+
+@keyframes spinner-fade {
+  0% {
+    opacity: 14%;
+  }
+  50% {
+    opacity: 100%;
+  }
+  100% {
+    opacity: 14%;
   }
 }

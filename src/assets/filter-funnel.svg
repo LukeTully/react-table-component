@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Funnel</title>
+    <desc>Filter Icon</desc>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="noun_Funnel_2141379" fill="#000000" fill-rule="nonzero">
+            <path d="M20,3 C20,0.631825 13.71435,0 10,0 C6.28565,0 0,0.631825 0,3 C0.0104417328,3.35232819 0.153378356,3.68775745 0.400275,3.939325 L7,12.667975 L7,18.5 C7,19.530275 8.555175,20 10,20 C11.444825,20 13,19.530275 13,18.5 L13,12.667975 L19.599725,3.939325 C19.8466216,3.68775745 19.9895583,3.35232819 20,3 Z M10,1.5 C14.963375,1.5 18.4707,2.5 18.4707,3 C18.4707,3.583325 14.963375,4.5 10,4.5 C5.036625,4.5 1.5293,3.583325 1.5293,3 C1.5293,2.479175 5.036625,1.5 10,1.5 Z" id="Shape"></path>
+        </g>
+    </g>
+</svg>

@@ -38,7 +38,6 @@ export function LTTable({ title, apiUrl, columns, searchable, paginatable, rowId
         }
     }
 
-
     const handleColumnSort = (e, col) => {
         if (lastSorted !== col.dataPath) {
             setLastSorted(col.dataPath);
@@ -46,29 +45,7 @@ export function LTTable({ title, apiUrl, columns, searchable, paginatable, rowId
         } else {
             changeSortDirection();
         }
-
-
-        // For this particular column, apply the provided sorting method, or use a default
-        let rowsToSort = rows;
-        if (col.sortMethod !== undefined) {
-
-            if (sortDirection === 'asc') {
-                rowsToSort.sort((a, b) => {
-                    return col.sortMethod(b[col.dataPath], a[col.dataPath]);
-                });
-            }
-            if (sortDirection === 'desc') {
-                rowsToSort.sort((a, b) => {
-                    return col.sortMethod(a[col.dataPath], b[col.dataPath]);
-                });
-            }
-        } else {
-            rowsToSort.sort();
-        }
-        setRows(rowsToSort);
     }
-
-
 
     const startFiltering = (e, col) => {
         if (filtering === col.dataPath) {

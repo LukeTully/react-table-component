@@ -84,9 +84,9 @@ export function LTTable({ title, apiUrl, columns, searchable, paginatable, rowId
     }
 
 
-    // Query the api on startup and when Page changes
+    // Query the api on startup and when any api param changes
     useEffect(() => {
-        fetchData(page).then(rows => {
+        fetchData(page, "https://jsonplaceholder.typicode.com/comments", searchQuery, activeFilters, sortBy, sortDirection).then(rows => {
             return setRows(rows);
         });
     }, [page, activeFilters, searchQuery, sortBy, sortDirection]);

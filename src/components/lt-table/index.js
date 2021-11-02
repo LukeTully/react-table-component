@@ -7,6 +7,7 @@ import FilterIcon from "../../assets/filter-funnel.svg";
 import LTPaginator from '../lt-paginator';
 import LTSpinner from '../lt-spinner';
 import LTTableRow from '../lt-table-row';
+import LTSearchBox from '../lt-search-box/lt-search-box';
 
 const DEFAULT_SORT_DIRECTION = 'desc';
 
@@ -25,15 +26,8 @@ export function LTTable({ title, apiUrl, columns, searchable, paginatable, rowId
     const [lastSorted, setLastSorted] = useState("");
 
 
-    const handleSearchQueryChange = (e, query) => {
+    const handleSearchQueryChange = (query) => {
         setSearchQuery(query);
-    }
-
-    const handleCommitSearchQuery = (e) => {
-        e.preventDefault();
-        fetchData(searchQuery).then((results) => {
-            setRows(results)
-        });
     }
 
     const changeSortDirection = () => {
@@ -64,7 +58,6 @@ export function LTTable({ title, apiUrl, columns, searchable, paginatable, rowId
                 });
             }
             if (sortDirection === 'desc') {
-                console.log("Sorted desc");
                 rowsToSort.sort((a, b) => {
                     return col.sortMethod(a[col.dataPath], b[col.dataPath]);
                 });
@@ -86,7 +79,7 @@ export function LTTable({ title, apiUrl, columns, searchable, paginatable, rowId
     }
 
 
-    const saveFiltersForCol = (col, filters) => {
+    const setFiltersForColumn = (col, filters) => {
 
         // Top level state contains a two-level mapping of dataPaths to their respective active filters
         // The format in which this is sent to the server would depend on how the server handles complex request parameters
@@ -127,13 +120,7 @@ export function LTTable({ title, apiUrl, columns, searchable, paginatable, rowId
             <pre>{JSON.stringify(activeFilters)}</pre>
             
             <div className="lt-table-controls">
-                <div className="search-input-field">
-                    <form onSubmit={(e) => handleCommitSearchQuery(e)}>
-                        <label htmlFor="search-input">Search: </label>
-                        <input className="lt-table-search-input" type="text" onChange={(e) => handleSearchQueryChange(e, e.currentTarget.value)} />
-                        <button type="submit">Submit</button>
-                    </form>
-                </div>
+                <LTSearchBox commitSearch={handleSearchQueryChange} />
                 <LTSpinner loading="true"/>
             </div>
             <table className="lt-table">
@@ -156,7 +143,7 @@ export function LTTable({ title, apiUrl, columns, searchable, paginatable, rowId
                                             className={"filter-menu" + (filtering === col.dataPath ? " active" : "")}
                                             filters={filters}
                                             dataPath={col.dataPath}
-                                            saveFilterSelection={(filters) => saveFiltersForCol(col.dataPath, filters)}
+                                            saveFilterSelection={(filters) => setFiltersForColumn(col.dataPath, filters)}
                                         />
                                     }
                                     </th>

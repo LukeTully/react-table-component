@@ -7,7 +7,7 @@ import FilterIcon from "../../assets/filter-funnel.svg";
 import LTPaginator from '../lt-paginator';
 import LTSpinner from '../lt-spinner';
 import LTTableRow from '../lt-table-row';
-import LTSearchBox from '../lt-search-box/lt-search-box';
+import LTSearchBox from '../lt-search-box';
 
 const DEFAULT_SORT_DIRECTION = 'desc';
 

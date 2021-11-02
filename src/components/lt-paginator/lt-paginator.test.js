@@ -1,5 +1,4 @@
-import { render, screen, waitFor, waitForElementToBeRemoved, fireEvent, within } from '@testing-library/react';
-import { act } from 'react-dom/test-utils';
+import { render, fireEvent, within } from '@testing-library/react';
 import LTPaginator from '.';
 
 

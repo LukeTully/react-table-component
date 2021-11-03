@@ -8,5 +8,7 @@ export const fetchData = (page = 1, apiUrl, searchQuery = null, filters, sortBy,
     const min = max - resultsPerPage;
     const results = testData;
 
-   return Promise.resolve(results.slice(min, max));
+   return new Promise(resolve => {
+       setTimeout(() => resolve(results.slice(min, max)), 3000);
+   });
 }

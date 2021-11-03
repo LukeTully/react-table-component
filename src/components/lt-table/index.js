@@ -25,6 +25,8 @@ export function LTTable({ title, apiUrl, columns, searchable, paginatable, rowId
     const [sortDirection, setSortDirection] = useState(DEFAULT_SORT_DIRECTION);
     const [lastSorted, setLastSorted] = useState("");
 
+    const [loading, setLoadingState] = useState(false);
+
 
     const handleSearchQueryChange = (query) => {
         setSearchQuery(query);
@@ -42,12 +44,14 @@ export function LTTable({ title, apiUrl, columns, searchable, paginatable, rowId
         if (lastSorted !== col.dataPath) {
             setLastSorted(col.dataPath);
             setSortDirection(DEFAULT_SORT_DIRECTION);
+            setSortBy(col.dataPath);
         } else {
             changeSortDirection();
         }
     }
 
-    const startFiltering = (e, col) => {
+    const toggleFiltering = (e, col) => {
+        e.stopPropagation();
         if (filtering === col.dataPath) {
             setFiltering(""); // Toggle the filter box off
         } else {
@@ -57,6 +61,8 @@ export function LTTable({ title, apiUrl, columns, searchable, paginatable, rowId
 
 
     const setFiltersForColumn = (col, filters) => {
+
+        
 
         // Top level state contains a two-level mapping of dataPaths to their respective active filters
         // The format in which this is sent to the server would depend on how the server handles complex request parameters
@@ -86,10 +92,13 @@ export function LTTable({ title, apiUrl, columns, searchable, paginatable, rowId
 
     // Query the api on startup and when any api param changes
     useEffect(() => {
+        setLoadingState(true);
         fetchData(page, "https://jsonplaceholder.typicode.com/comments", searchQuery, activeFilters, sortBy, sortDirection).then(rows => {
+            setLoadingState(false);
             return setRows(rows);
         });
     }, [page, activeFilters, searchQuery, sortBy, sortDirection]);
+
 
     return (
         <div className="lt-table-container">
@@ -98,7 +107,7 @@ export function LTTable({ title, apiUrl, columns, searchable, paginatable, rowId
             
             <div className="lt-table-controls">
                 <LTSearchBox commitSearch={handleSearchQueryChange} />
-                <LTSpinner loading="true"/>
+                <LTSpinner loading={loading}/>
             </div>
             <table className="lt-table">
                 <thead>
@@ -113,7 +122,7 @@ export function LTTable({ title, apiUrl, columns, searchable, paginatable, rowId
                                 return (
                                     <th key={col.id} id={`lt-table-header-${col.dataPath}`} className="lt-table-col-th" onClick={(e) => handleColumnSort(e, col)}>
                                         {col.title} &#x2304;
-                                        <button className="col-filter-button" onClick={(e) => startFiltering(e, col)}><img src={FilterIcon} alt="Filter this column" width="15" height="15"/><span className="col-filter-button-text">Filter</span></button>
+                                        <button className="col-filter-button" onClick={(e) => toggleFiltering(e, col)}><img src={FilterIcon} alt="Filter this column" width="15" height="15"/><span className="col-filter-button-text">Filter</span></button>
         
                                         {(filtering === col.dataPath) &&  
                                             <LTColumnFilter

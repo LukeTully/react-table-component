@@ -74,7 +74,7 @@ test('Ensure that all pagination buttons correctly change the page number throug
        // Do Nothing
     })
 
-    render(<LTPaginator maxPagesToRender={maxNumbersToRenderBeforeEllipsis} pages={totalPages} pageNumber={2} pageChange={handlePageChange}></LTPaginator>)
+    render(<LTPaginator maxPagesToRender={maxNumbersToRenderBeforeEllipsis} pages={totalPages} pageCount={15} pageNumber={2} pageChange={handlePageChange}></LTPaginator>)
     
     const pageNumberContainer = document.querySelector('.lt-paginator-buttons-list');
 

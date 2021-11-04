@@ -15,6 +15,7 @@ const LTPaginator = ({ pageCount, pageNumber, maxPagesToRender, pageChange }) =>
     }
 
     const pageSelected = (e) => {
+        e.stopPropagation();
         pageChange(parseInt(e.currentTarget.value, 10));
     }
 

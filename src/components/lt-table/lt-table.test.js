@@ -203,18 +203,17 @@ test('Commiting a new filter selection makes an api call with correct params', a
 
     const columnToTest = columns[3];
 
-
+    // Example props needed for rendering LTTable
     const currentPage = 1;
     const apiUrl = '/comments';
     const title = columnToTest.title;
 
     // Setup the table and wait for it to finish rendering the initial document
-    render(<LTTable title={columnToTest.title} columns={columns} rowIdentifier="id" apiUrl="/comments" />)
+    render(<LTTable title={title} columns={columns} rowIdentifier="id" apiUrl={apiUrl} />)
     await waitFor(() => { screen.getByRole('heading') })
 
     
     const tableHeader = document.getElementById('lt-table-header-email');
-    
     const filterButton = tableHeader.querySelector('.col-filter-button');
     
     expect(within(tableHeader).queryByText(columnToTest.filters[0])).not.toBeInTheDocument();
@@ -230,7 +229,7 @@ test('Commiting a new filter selection makes an api call with correct params', a
     fireEvent.click(filterSaveButton);
 
     // Check that the api was called
-    expect(api).toHaveBeenCalledWith(1, apiUrl, "", {email: [columnToTest.filters[0]]}, "", "desc");
+    expect(api).toHaveBeenCalledWith(currentPage, apiUrl, "", {email: [columnToTest.filters[0]]}, "", "desc");
 
 
     // Cleanup
@@ -238,10 +237,38 @@ test('Commiting a new filter selection makes an api call with correct params', a
 });
 
 
+test('Submitting a search triggers api call with correct params', async () => {
+
+    // Get and type into the search box after render
+    const api = mockFetchData();
+    jest.useFakeTimers();
+
+    const columnToTest = columns[3];
+
+    // Example props needed for rendering LTTable
+    const currentPage = 1;
+    const apiUrl = '/comments';
+    const title = columnToTest.title;
+
+    // Setup the table and wait for it to finish rendering the initial document
+    render(<LTTable title={title} columns={columns} rowIdentifier="id" apiUrl={apiUrl} />)
+    
+
+    // Get and click the search submit button to trigger an api call
+    const searchInput = document.querySelector('.lt-table-search-input');
+    
+
+    const s = 'example search';
+    // Confirm that the fetchData function was called with the correct params
+    fireEvent.change(searchInput, {target: {value: s}})
+    expect(searchInput).toHaveValue(s);
+
+    fireEvent.submit(searchInput);
+    expect(api).toHaveBeenCalledTimes(2);
+    expect(api).toHaveBeenLastCalledWith(currentPage, apiUrl, s, {}, "", "desc");
+});
 
 
-
-test('Submitting a search triggers api call with correct params', () => { });
-test('Selecting a new page triggers a api call with correct params', () => { });
+test('Selecting a new page triggers a api call with correct params', () => {});
 test('Changing column sort direction triggers api call with correct params', () => { });
 test('Sorting by a new column triggers api call with correct params', () => { });

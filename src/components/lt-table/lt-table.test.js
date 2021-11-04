@@ -66,8 +66,14 @@ const exampleRow = {
     "body": "laudantium enim quasi est quidem magnam voluptate ipsam eos\ntempora quo necessitatibus\ndolor quam autem quasi\nreiciendis et nam sapiente accusantium"
 };
 
+beforeEach(() => {
+    jest.useFakeTimers();
+});
 
-
+afterEach(() => {
+    jest.clearAllTimers();
+    jest.useRealTimers();
+});
 
 test('Renders Table Titles', async () => {
     const titleToTest = 'Experiment 1';

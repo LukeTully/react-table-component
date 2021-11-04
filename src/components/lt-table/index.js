@@ -11,7 +11,7 @@ import LTSearchBox from '../lt-search-box';
 
 const DEFAULT_SORT_DIRECTION = 'desc';
 
-export function LTTable({ title, apiUrl, columns, searchable, paginatable, rowIdentifier }) {
+export function LTTable({ title, apiUrl = "https://jsonplaceholder.typicode.com/comments", columns, searchable, paginatable, rowIdentifier }) {
 
 
     const [page, setPage] = useState(1);

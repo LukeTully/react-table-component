@@ -1,7 +1,5 @@
-import { render, screen, waitFor, waitForElementToBeRemoved, fireEvent, within, act } from '@testing-library/react';
-import LTTableRow from '../lt-table-row';
+import { render, screen, waitFor, waitForElementToBeRemoved, fireEvent, within } from '@testing-library/react';
 import { LTTable } from '.';
-import { rowIdentifierNotFound } from '../../errors';
 import * as Services from "../../services";
 import testData from '../../store/test-data';
 
@@ -75,65 +73,6 @@ afterEach(() => {
     jest.useRealTimers();
 });
 
-test('Renders Table Titles', async () => {
-
-    const titleToTest = 'Experiment 1';
-
-    render(<LTTable title={titleToTest} columns={columns} rowIdentifier="id" apiUrl="/comments" />)
-
-    // Wait for the title of the table component to render
-    await waitFor(() => { screen.getByRole('heading') })
-
-    // Check that the title that we've passed in as a prop is rendered correctly
-    expect(screen.getByRole('heading')).toHaveTextContent(titleToTest);
-
-});
-
-test('LTTableRow handles incorrect rowIdentifier by throwing error', async () => {
-    jest.spyOn(console, 'error');
-
-    const expectedErrorMsg = rowIdentifierNotFound(exampleRow);
-    expectToSilentryThrowError(() => render(<LTTableRow row={exampleRow} rowIdentifier="wrong" />), expectedErrorMsg)
-
-
-})
-
-function stripNewlinesFromString(s) {
-    if (typeof s !== 'string') throw new Error(`Input ${s} was not a string and could not have newlines stripped from it.`)
-    return s.replace(/(\r\n|\n|\r)/gm, " ").trim();
-}
-
-test('LTTableRow renders row contents when given valid rowIdentifier', async () => {
-    render(
-        <table>
-            <tbody>
-                <LTTableRow row={exampleRow} rowIdentifier="id" />
-            </tbody>
-        </table>
-    );
-
-    let rowKeyPairs = Object.entries(exampleRow);
-    let bodyNode = await waitFor(() => screen.findAllByRole('cell'));
-
-    for (let i = 0; i < bodyNode.length; i++) {
-        let expectedCellBody = rowKeyPairs[i][1];
-        if (typeof rowKeyPairs[i][1] === 'string') {
-            expectedCellBody = stripNewlinesFromString(expectedCellBody);
-        }
-        expect(bodyNode[i]).toHaveTextContent(expectedCellBody);
-    }
-
-
-});
-
-
-function expectToSilentryThrowError(fn, message) {
-    jest.spyOn(console, "error")
-    console.error.mockImplementation(() => { })
-    expect(fn).toThrowError(message);
-    console.error.mockRestore()
-}
-
 function mockFetchData() {
     return jest.spyOn(Services, 'fetchData').mockImplementation(async () => {
         let timer = null;
@@ -144,6 +83,19 @@ function mockFetchData() {
     })
 }
 
+test('Renders LTTable title', async () => {
+
+    const title = 'Experiment 1';
+
+    render(<LTTable title={title} columns={columns} rowIdentifier="id" apiUrl="/comments" />)
+
+    /* Wait for the title of the table component to render */
+    await waitFor(() => { screen.getByRole('heading') })
+
+    /* Check that the title that we've passed in as a prop is rendered correctly */
+    expect(screen.getByRole('heading')).toHaveTextContent(title);
+
+});
 
 test("Filter box correctly toggles", async () => {
 
@@ -170,8 +122,8 @@ test("Filter box correctly toggles", async () => {
 
 
 test('Triggering a network call correctly shows loading indicator', async () => {
+    
     const api = mockFetchData();
-
     const app = render(<LTTable title={"example"} columns={columns} rowIdentifier="id" apiUrl="/comments" />);
 
     /* Initial render should trigger an api call which displays the loading indicator */
@@ -205,67 +157,66 @@ test('Triggering a network call correctly shows loading indicator', async () => 
 test('Commiting a new filter selection makes an api call with correct params', async () => {
 
     const api = mockFetchData();
- 
     const columnToTest = columns[3];
 
-    // Example props needed for rendering LTTable
+    /* Example props needed for rendering LTTable */
     const currentPage = 1;
     const apiUrl = '/comments';
     const title = columnToTest.title;
 
-    // Setup the table and wait for it to finish rendering the initial document
+    /* Setup the table and wait for it to finish rendering the initial document */
     render(<LTTable title={title} columns={columns} rowIdentifier="id" apiUrl={apiUrl} />)
     await waitFor(() => { screen.getByRole('heading') })
+    await waitForElementToBeRemoved(screen.queryByText(/Loading/i));
 
-
+    /* Get the specific nodes to work with in this test */
     const tableHeader = document.getElementById('lt-table-header-email');
     const filterButton = tableHeader.querySelector('.col-filter-button');
 
-    expect(within(tableHeader).queryByText(columnToTest.filters[0])).not.toBeInTheDocument();
-
-    jest.advanceTimersByTime(2500);
+    /* Make the filter box appear */
     fireEvent.click(filterButton);
     const firstFilterOptionElement = await within(tableHeader).findByText(columnToTest.filters[0])
     const filterFormContainer = document.getElementById('filter-form-email');
     const filterSaveButton = filterFormContainer.querySelector('input[type=submit');
 
-    // Trigger a save for the new filter selections
+    /* Confirm that the first filter for this column has been rendered correctly */
+    expect(within(tableHeader).queryByText(columnToTest.filters[0])).toBeInTheDocument();
+
+    /* Trigger a save for the new filter selections */
     fireEvent.click(firstFilterOptionElement);
     fireEvent.click(filterSaveButton);
 
-    // Check that the api was called
+    /* Check that the api was called */
     expect(api).toHaveBeenCalledWith(currentPage, apiUrl, "", { email: [columnToTest.filters[0]] }, "", "desc");
 });
 
 
 test('Submitting a search triggers api call with correct params', async () => {
 
-    // Get and type into the search box after render
+    /* Get and type into the search box after render */
     const api = mockFetchData();
- 
     const columnToTest = columns[3];
 
-    // Example props needed for rendering LTTable
+    /* Example props needed for rendering LTTable */
     const currentPage = 1;
     const apiUrl = '/comments';
     const title = columnToTest.title;
 
-    // Setup the table and wait for it to finish rendering the initial document
+    /* Setup the table and wait for it to finish rendering the initial document */
     render(<LTTable title={title} columns={columns} rowIdentifier="id" apiUrl={apiUrl} />)
 
-
-    // Get and click the search submit button to trigger an api call
+    /* Get and click the search submit button to trigger an api call */
     const searchInput = document.querySelector('.lt-table-search-input');
+    
+    /* Confirm that the fetchData function was called with the correct params */
+    const searchTerm = 'example search';
+    fireEvent.change(searchInput, { target: { value: searchTerm } })
+    expect(searchInput).toHaveValue(searchTerm);
 
-
-    const s = 'example search';
-    // Confirm that the fetchData function was called with the correct params
-    fireEvent.change(searchInput, { target: { value: s } })
-    expect(searchInput).toHaveValue(s);
-
+    /* Submit the new search query */
     fireEvent.submit(searchInput);
     expect(api).toHaveBeenCalledTimes(2);
-    expect(api).toHaveBeenLastCalledWith(currentPage, apiUrl, s, {}, "", "desc");
+    expect(api).toHaveBeenLastCalledWith(currentPage, apiUrl, searchTerm, {}, "", "desc");
 
 });
 
@@ -273,7 +224,7 @@ test('Submitting a search triggers api call with correct params', async () => {
 test('Selecting a new page triggers a api call with correct params', async () => {
     const columnToTest = columns[3];
 
-// Example props needed for rendering LTTable
+    /* Example props needed for rendering LTTable */
     const currentPage = 1;
     const apiUrl = '/comments';
     const title = columnToTest.title;
@@ -289,22 +240,22 @@ test('Selecting a new page triggers a api call with correct params', async () =>
     await waitForElementToBeRemoved(() =>
         screen.queryByText(/Loading/i)
     );
-    
+
     /* Confirm that loading indicator is removed after initial load */
     jest.advanceTimersByTime(2500);
     expect(app.queryByText(/Loading/i)).not.toBeInTheDocument();
-    
+
     const paginatorNumberedButtonsContainer = document.querySelector('.lt-paginator-buttons-list');
 
-    // Wait for the numeric buttons to render
+    /* Wait for the numeric buttons to render */
     const buttons = within(paginatorNumberedButtonsContainer).getAllByRole('button');
 
     let callCount = 1; // The api should be called once on render
-    
+
     /* Click the first numeric page button to trigger the second api call */
     fireEvent.click(buttons[1]);
     callCount++;
-    
+
     expect(api).toHaveBeenCalledTimes(callCount);
     expect(api).toHaveBeenLastCalledWith(parseInt(2, 10), apiUrl, "", {}, "", "desc")
 
@@ -327,8 +278,6 @@ test('Selecting a new page triggers a api call with correct params', async () =>
     expect(api).toHaveBeenCalledTimes(callCount);
     expect(api).toHaveBeenLastCalledWith(parseInt(2, 10), apiUrl, "", {}, "", "desc")
 
-
-    
 });
 
 test('Changing column sort direction triggers api call with correct params', async () => {
@@ -345,15 +294,13 @@ test('Changing column sort direction triggers api call with correct params', asy
     await waitForElementToBeRemoved(() =>
         screen.queryByText(/Loading/i)
     );
-    
+
     /* Confirm that loading indicator is removed after initial load */
     jest.advanceTimersByTime(2500);
     expect(app.queryByText(/Loading/i)).not.toBeInTheDocument();
-    
-    // The email column in our example data is filterable and has filters defined for it, so let's make sure that pressing the filter button actually shows the filter box
-    const tableHeader = document.getElementById('lt-table-header-email');
-    
 
+    /* The email column in our example data is filterable and has filters defined for it, so let's make sure that pressing the filter button actually shows the filter box */
+    const tableHeader = document.getElementById('lt-table-header-email');
     fireEvent.click(tableHeader);
 
     await waitFor(() => {
@@ -361,25 +308,21 @@ test('Changing column sort direction triggers api call with correct params', asy
     });
 
     expect(screen.queryByText(/Loading/i)).toBeInTheDocument();
-
-
     expect(api).toHaveBeenCalledTimes(2);
-
 });
 test('Sorting by a new column triggers api call with correct params', async () => {
 
 
-const api = mockFetchData();
+    const api = mockFetchData();
 
-const columnToTest = columns[3];
+    const columnToTest = columns[3];
 
-// Example props needed for rendering LTTable
+    /* Example props needed for rendering LTTable */
     const currentPage = 1;
     const apiUrl = '/comments';
     const title = columnToTest.title;
 
-
-    const app = render(<LTTable title={"example"} columns={columns} rowIdentifier="id" apiUrl="/comments" />);
+    const app = render(<LTTable title={title} columns={columns} rowIdentifier="id" apiUrl="/comments" />);
 
     /* Initial render should trigger an api call which displays the loading indicator */
     expect(api).toHaveBeenCalledTimes(1);
@@ -389,34 +332,36 @@ const columnToTest = columns[3];
     await waitForElementToBeRemoved(() =>
         screen.queryByText(/Loading/i)
     );
-    
+
     /* Confirm that loading indicator is removed after initial load */
     jest.advanceTimersByTime(2500);
     expect(app.queryByText(/Loading/i)).not.toBeInTheDocument();
-    
-    // The email column in our example data is filterable and has filters defined for it, so let's make sure that pressing the filter button actually shows the filter box
+
+    /* The email column in our example data is filterable and has filters defined for it, so let's make sure that pressing the filter button actually shows the filter box */
     const tableHeader = document.getElementById('lt-table-header-email');
     const secondTableHeader = document.getElementById('lt-table-header-name');
 
+    /* Establish the first sorting column */    
     fireEvent.click(tableHeader);
 
     await waitFor(() => {
         return screen.queryByText(/Loading/i);
     });
 
-
+    /* Wait for the api call to return */
     const loadingIndicator = screen.queryByText(/Loading/i);
     expect(loadingIndicator).toBeInTheDocument();
 
+    /* Verify that the api was called the correct amount of times and with the expected params */
     expect(api).toHaveBeenCalledTimes(2);
     expect(api).toHaveBeenLastCalledWith(currentPage, apiUrl, "", {}, "email", "desc")
 
+    /* Wait for the loading indicator to dissappear */
     await waitForElementToBeRemoved(loadingIndicator);
     expect(loadingIndicator).not.toBeInTheDocument();
 
+    /* Establish the next api call by switch which column is being sorted by */
     fireEvent.click(secondTableHeader);
     expect(api).toHaveBeenCalledTimes(3);
     expect(api).toHaveBeenLastCalledWith(currentPage, apiUrl, "", {}, "name", "desc")
-
-
 });

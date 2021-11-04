@@ -189,3 +189,10 @@ test('Triggering a network call correctly shows loading indicator', async () => 
     await waitForElementToBeRemoved(app.queryByText(/Loading/i));
     expect(app.queryByText(/Loading/i)).not.toBeInTheDocument();
 });
+
+
+test('Commiting a new filter selection makes an api call with correct params', () => {});
+test('Submitting a search triggers api call with correct params', () => {});
+test('Selecting a new page triggers a api call with correct params', () => {});
+test('Changing column sort direction triggers api call with correct params', () => {});
+test('Sorting by a new column triggers api call with correct params', () => {});

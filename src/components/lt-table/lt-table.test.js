@@ -133,6 +133,15 @@ function expectToSilentryThrowError(fn, message) {
     console.error.mockRestore()
 }
 
+function mockFetchData() {
+    return jest.spyOn(Services, 'fetchData').mockImplementation(async () => {
+        let timer = null;
+        return new Promise(resolve => {
+            if (timer) clearTimeout(timer);
+            timer = setTimeout(() => resolve(testData), 2000);
+        });
+    })
+}
 
 
 test("Filter box correctly toggles", async () => {

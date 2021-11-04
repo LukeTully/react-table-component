@@ -27,6 +27,8 @@ export function LTTable({ title, apiUrl = "https://jsonplaceholder.typicode.com/
 
     const [loading, setLoadingState] = useState(false);
 
+    const downArrow = '\u25b2';
+    const upArrow = '\u25bc';
 
     const handleSearchQueryChange = (query) => {
         setSearchQuery(query);
@@ -59,10 +61,7 @@ export function LTTable({ title, apiUrl = "https://jsonplaceholder.typicode.com/
         }
     }
 
-
     const setFiltersForColumn = (col, filters) => {
-
-        
 
         // Top level state contains a two-level mapping of dataPaths to their respective active filters
         // The format in which this is sent to the server would depend on how the server handles complex request parameters
@@ -82,32 +81,27 @@ export function LTTable({ title, apiUrl = "https://jsonplaceholder.typicode.com/
         setActiveFilters({ ...activeFilters });
     }
 
-
-
     const handlePageChanged = (nextPage) => {
-        console.log(`Next page is ${nextPage}`);
-        setPage(nextPage);        
+        setPage(nextPage);
     }
-
 
     // Query the api on startup and when any api param changes
     useEffect(() => {
         setLoadingState(true);
-        fetchData(page, "https://jsonplaceholder.typicode.com/comments", searchQuery, activeFilters, sortBy, sortDirection).then(rows => {
+        fetchData(page, apiUrl, searchQuery, activeFilters, sortBy, sortDirection).then(rows => {
+            setRows(rows);
             setLoadingState(false);
-            return setRows(rows);
         });
-    }, [page, activeFilters, searchQuery, sortBy, sortDirection]);
+       
+    }, [page, apiUrl, activeFilters, searchQuery, sortBy, sortDirection]);
 
 
     return (
         <div className="lt-table-container">
             <h2>{title} Page: {page}</h2>
-            <pre>{JSON.stringify(activeFilters)}</pre>
-            
             <div className="lt-table-controls">
                 <LTSearchBox commitSearch={handleSearchQueryChange} />
-                <LTSpinner loading={loading}/>
+                <LTSpinner loading={loading} />
             </div>
             <table className="lt-table">
                 <thead>
@@ -121,23 +115,22 @@ export function LTTable({ title, apiUrl = "https://jsonplaceholder.typicode.com/
                             if (filterable && hasFilters) {
                                 return (
                                     <th key={col.id} id={`lt-table-header-${col.dataPath}`} className="lt-table-col-th" onClick={(e) => handleColumnSort(e, col)}>
-                                        {col.title} &#x2304;
-                                        <button className="col-filter-button" onClick={(e) => toggleFiltering(e, col)}><img src={FilterIcon} alt="Filter this column" width="15" height="15"/><span className="col-filter-button-text">Filter</span></button>
-        
-                                        {(filtering === col.dataPath) &&  
+                                        {`${col.title} ${sortDirection === 'asc' ? downArrow : upArrow}`}
+                                        <button className="col-filter-button" onClick={(e) => toggleFiltering(e, col)}><img src={FilterIcon} alt="Filter this column" width="15" height="15" /><span className="col-filter-button-text">Filter</span></button>
+                                        {(filtering === col.dataPath) &&
                                             <LTColumnFilter
-                                            className={"filter-menu" + (filtering === col.dataPath ? " active" : "")}
-                                            filters={filters}
-                                            dataPath={col.dataPath}
-                                            saveFilterSelection={(filters) => setFiltersForColumn(col.dataPath, filters)}
-                                        />
-                                    }
+                                                className={"filter-menu" + (filtering === col.dataPath ? " active" : "")}
+                                                filters={filters}
+                                                dataPath={col.dataPath}
+                                                saveFilterSelection={(filters) => setFiltersForColumn(col.dataPath, filters)}
+                                            />
+                                        }
                                     </th>
                                 )
                             } else {
                                 return (
-                                    <th key={col.id} id={`lt-table-header-${col.dataPath}`} className="lt-table-col-th" onClick={(e) => handleColumnSort(e, col)}>
-                                        <span>{col.title} &#x2304;</span>
+                                    <th key={col.id} id={`lt-table-header-${col.dataPath}`} className="lt-table-col-th" onClick={(e) => handleColumnSort(e, col)}>                                        
+                                        {`${col.title} ${sortDirection === 'asc' ? downArrow : upArrow}`}
                                     </th>
                                 )
                             }
